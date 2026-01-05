@@ -18,6 +18,8 @@ class Operations:
             long_description = f.read()
             return long_description
 
+    def is_allowed(file: str) -> bool:
+        return file.lower().endswith(ALLOWED_EXT)
 
 class Movement: 
     def forwardDirectory(dirName: str):
@@ -30,18 +32,16 @@ operations = Operations
 movement = Movement
 
 
-def is_allowed(file: str) -> bool:
-    return file.lower().endswith(ALLOWED_EXT)
+ 
 
-line: int = 1
-def main(directory: str, line: int): 
+def main(directory: str, line: int ): 
 
     for file in directory: 
         try: 
             if file in IGNORED_FILES:
                 pass
             else: 
-                if is_allowed(file):
+                if operations.is_allowed(file):
                     # File Scanning 
                     output = operations.read(file)
                     print(line, output.split("\n"))
@@ -59,5 +59,5 @@ def main(directory: str, line: int):
 
     return line
 
-total = main(os.listdir(), line)
+total = main(os.listdir(), 1)
 print("total line: ", total)
