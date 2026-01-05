@@ -5,19 +5,14 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="app.log")
 
-
 # Global Variables 
-ALLOWED_EXT = ["txt", "md", "py", "ts", "js"]
-IGNORED_FILES = ["app.log", "main.py"]
+ALLOWED_EXT = (".txt", ".md", ".py", ".ts", ".js")
+IGNORED_FILES = ["app.log", "main.py", ".gitignore", ".git"]
 
-BASE_DIR = os.getcwd()
-  
+   
 
 # Classes
 class Operations: 
-    def __init__(self):
-        pass
-    
     def read(file: str) -> str: 
         with open(file) as f:
             long_description = f.read()
@@ -25,12 +20,8 @@ class Operations:
 
 
 class Movement: 
-    def __init__(self):
-        pass
-
     def forwardDirectory(dirName: str):
         os.chdir(dirName)
-        print(f"Current Directory: {dirName}")
 
     def backDirectory(): 
         os.chdir("..")
@@ -38,41 +29,35 @@ class Movement:
 operations = Operations
 movement = Movement
 
-def main(directory: str): 
+
+def is_allowed(file: str) -> bool:
+    return file.lower().endswith(ALLOWED_EXT)
+
+line: int = 1
+def main(directory: str, line: int): 
+
     for file in directory: 
         try: 
             if file in IGNORED_FILES:
                 pass
             else: 
-                if ".txt" in file:
+                if is_allowed(file):
+                    # File Scanning 
                     output = operations.read(file)
-                    print(output)
+                    print(line, output.split("\n"))
+                    line = line + len(output.split("\n")) 
 
                 else:
                     logger.error(f"Error this is not a file proceed in: {file}")
-                    
                     movement.forwardDirectory(file)
-
-                    for file2 in os.listdir(): 
-                        if ".txt" in file2:
-                            output = operations.read(file2)
-                            print(output)
-                        else: 
-                            movement.forwardDirectory(file2)
-                            for file3 in os.listdir():
-                                output = operations.read(file3)
-                                print(output)
-                            movement.backDirectory()
-
-                    movement.backDirectory()    
+                    main(os.listdir(), line)
+                    movement.backDirectory()
 
         except TypeError as error: 
-            logger.error(f"There is some error : {error}")
+            logger.error(f"Internal Error: {error}")
             break
- 
-       
 
-main(os.listdir())
+    return line
 
-
- 
+total = main(os.listdir(), line)
+print("total line: ", total)
